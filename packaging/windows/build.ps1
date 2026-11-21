@@ -21,6 +21,28 @@ foreach ($directory in @($artifacts, $output, $outputLicenses)) {
     }
 }
 
+function Get-CargoMetadata {
+    # cargo 输出 UTF-8；中文 Windows 的控制台代码页是 936，直接捕获会把
+    # Cargo.toml 里的中文 description 解成乱码并破坏 JSON，故以 UTF-8 直读管道。
+    $startInfo = [Diagnostics.ProcessStartInfo]::new('cargo', 'metadata --no-deps --format-version 1 --locked')
+    $startInfo.WorkingDirectory = $root
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
+    $startInfo.StandardErrorEncoding = [Text.UTF8Encoding]::new($false)
+    $process = [Diagnostics.Process]::Start($startInfo)
+    # 先异步收 stderr，避免管道写满后与 stdout 互锁。
+    $errorTask = $process.StandardError.ReadToEndAsync()
+    $json = $process.StandardOutput.ReadToEnd()
+    $errorText = $errorTask.GetAwaiter().GetResult()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) {
+        throw "cargo metadata 失败：$errorText"
+    }
+    return $json | ConvertFrom-Json
+}
+
 if ($Installer) {
     if ([string]::IsNullOrWhiteSpace($IsccPath)) {
         $IsccPath = @(
@@ -44,9 +66,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'cargo clippy 检查失败。' }
     cargo test --workspace --locked
     if ($LASTEXITCODE -ne 0) { throw 'cargo test 失败。' }
-    $metadataJson = cargo metadata --no-deps --format-version 1 --locked
-    if ($LASTEXITCODE -ne 0) { throw 'cargo metadata 失败。' }
-    $metadata = $metadataJson | ConvertFrom-Json
+    $metadata = Get-CargoMetadata
 
     cargo --config 'target.x86_64-pc-windows-msvc.rustflags=["-C","target-feature=+crt-static"]' build --release --locked --target $target
     if ($LASTEXITCODE -ne 0) { throw 'cargo build --release 失败。' }
