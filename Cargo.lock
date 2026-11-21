@@ -2964,7 +2964,7 @@ dependencies = [
 
 [[package]]
 name = "nkyoa-tray"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "async-trait",
  "serde",
@@ -5152,7 +5152,7 @@ dependencies = [
 
 [[package]]
 name = "tray-core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "async-trait",
  "httpdate",

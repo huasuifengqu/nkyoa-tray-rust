@@ -329,7 +329,7 @@ fn render(state: &SharedState) {
     ));
     window.set_busy(state.busy.load(Ordering::SeqCst));
     window.set_autostart(state.platform.is_autostart_enabled());
-    window.set_version_text(format!("nkyoa {}", state.registration.client_version).into());
+    window.set_version_text(format!("OA通知 {}", state.registration.client_version).into());
     if window.get_origin_text().is_empty()
         && let Some(home) = &home
     {
@@ -484,7 +484,7 @@ fn spawn_test_notification(state: &Arc<SharedState>) {
     let state = state.clone();
     spawn(state.clone(), async move {
         let popup = Popup {
-            title: "nkyoa 桌面通知".to_owned(),
+            title: "OA通知".to_owned(),
             body: "这是一条本机测试通知。".to_owned(),
             home: None,
             event_count: 1,

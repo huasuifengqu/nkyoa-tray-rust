@@ -112,7 +112,7 @@ fn selftest_notification() -> u8 {
     let runtime = new_runtime();
     let notifier = notifier::WindowsNotifier::new();
     let popup = Popup {
-        title: "nkyoa 桌面通知".to_owned(),
+        title: "OA通知".to_owned(),
         body: "这是一条本机测试通知。".to_owned(),
         home: None,
         event_count: 1,

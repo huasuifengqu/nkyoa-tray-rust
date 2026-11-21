@@ -51,7 +51,7 @@ Root: HKCU; Subkey: "Software\Classes\{#Protocol}\shell\open\command"; ValueType
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "NKYOA.Tray.Rust"; Flags: dontcreatekey uninsdeletevalue
 
 [Run]
-Filename: "{app}\{#AppExe}"; Description: "打开 nkyoa 桌面通知"; Flags: postinstall nowait skipifsilent
+Filename: "{app}\{#AppExe}"; Description: "打开 OA通知"; Flags: postinstall nowait skipifsilent
 
 [Code]
 const

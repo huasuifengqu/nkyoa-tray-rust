@@ -6,7 +6,7 @@
 import { AboutSlint, Button, CheckBox, LineEdit, Palette, ScrollView } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
-    title: "nkyoa 桌面通知";
+    title: "OA通知";
     preferred-width: 580px;
     preferred-height: 680px;
     min-width: 380px;
@@ -297,7 +297,7 @@ export component AppTray inherits SystemTrayIcon {
     in property <bool> paused: false;
 
     icon: @image-url("assets/tray-icon.png");
-    tooltip: "nkyoa 通知 · " + status-text;
+    tooltip: "OA通知 · " + status-text;
     visible: true;
 
     callback open-home();
