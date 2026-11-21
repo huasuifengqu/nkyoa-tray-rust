@@ -1,0 +1,8 @@
+{
+  "type": "urn:nkyoa:error:NOTIFY_HISTORY_EXPIRED",
+  "title": "部分通知历史已过期",
+  "status": 410,
+  "detail": "部分通知历史已过期，请重新同步",
+  "code": "NOTIFY_HISTORY_EXPIRED",
+  "traceId": "fixture"
+}

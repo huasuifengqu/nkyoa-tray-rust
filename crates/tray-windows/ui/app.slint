@@ -1,0 +1,340 @@
+// nkyoa 桌面通知：设置窗口与系统托盘。
+//
+// 颜色使用 Fluent Palette，跟随系统明暗主题；中文字体优先使用
+// Microsoft YaHei UI，缺失时由字体回退链选择可用中文字体。
+
+import { AboutSlint, Button, CheckBox, LineEdit, Palette, ScrollView } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    title: "nkyoa 桌面通知";
+    preferred-width: 580px;
+    preferred-height: 680px;
+    min-width: 380px;
+    min-height: 460px;
+    default-font-family: "Microsoft YaHei UI";
+    default-font-size: 14px;
+    icon: @image-url("assets/tray-icon.png");
+
+    in-out property <string> status-text: "尚未绑定";
+    in-out property <string> details-text;
+    in-out property <string> recovery-text;
+    in-out property <bool> show-recovery: recovery-text != "";
+    in-out property <bool> show-tray-warning: false;
+    in-out property <string> origin-text;
+    in-out property <string> pairing-text;
+    in-out property <string> device-text;
+    in-out property <string> feedback-text;
+    in-out property <bool> show-feedback: feedback-text != "";
+    in-out property <bool> autostart;
+    in-out property <bool> paused;
+    in-out property <bool> busy;
+    in-out property <bool> has-binding;
+    in-out property <bool> can-retry;
+    in-out property <bool> confirming-unbind;
+    in-out property <string> version-text;
+
+    callback bind-clicked();
+    callback retry-clicked();
+    callback unbind-requested();
+    callback unbind-confirmed();
+    callback unbind-cancelled();
+    callback autostart-toggled(bool);
+    callback pause-toggled(bool);
+    callback open-home();
+    callback test-notification();
+    callback export-diagnostics();
+    callback exit-clicked();
+
+    ScrollView {
+        horizontal-scrollbar-policy: ScrollBarPolicy.always-off;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 16px;
+            alignment: start;
+
+            HorizontalLayout {
+                spacing: 12px;
+                Text {
+                    text: "桌面通知";
+                    font-size: 26px;
+                    font-weight: 600;
+                }
+                Rectangle { horizontal-stretch: 1; }
+                Button {
+                    text: "关于";
+                    clicked => { about-popup.show(); }
+                }
+            }
+
+            Rectangle {
+                background: Palette.alternate-background;
+                border-radius: 8px;
+                min-height: status-layout.preferred-height;
+                max-height: status-layout.preferred-height;
+                vertical-stretch: 0;
+
+                status-layout := VerticalLayout {
+                    padding: 14px;
+                    spacing: 5px;
+
+                    Text {
+                        text: root.status-text;
+                        font-weight: 600;
+                        color: Palette.foreground;
+                    }
+
+                    if root.details-text != "" : Text {
+                        text: root.details-text;
+                        wrap: word-wrap;
+                        color: Palette.foreground;
+                        opacity: 0.82;
+                    }
+
+                    if root.show-recovery : Text {
+                        text: root.recovery-text;
+                        wrap: word-wrap;
+                        color: Palette.foreground;
+                        opacity: 0.82;
+                    }
+
+                    if root.show-tray-warning : Text {
+                        text: "系统托盘不可用。可从此窗口管理连接或退出。";
+                        wrap: word-wrap;
+                        color: #b45309;
+                    }
+                }
+            }
+
+            VerticalLayout {
+                spacing: 5px;
+
+                Text { text: "服务器地址"; }
+                LineEdit {
+                    text <=> root.origin-text;
+                    placeholder-text: "例如 oa.example.com";
+                    enabled: !root.busy;
+                }
+
+                Text { text: "通知校验码"; }
+                LineEdit {
+                    text <=> root.pairing-text;
+                    placeholder-text: "从 OA 网页安全中心复制";
+                    input-type: password;
+                    enabled: !root.busy;
+                }
+
+                Text { text: "设备名称"; }
+                LineEdit {
+                    text <=> root.device-text;
+                    placeholder-text: "办公电脑";
+                    enabled: !root.busy;
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    padding-top: 4px;
+
+                    Button {
+                        text: "连接并保存";
+                        primary: true;
+                        enabled: !root.busy;
+                        clicked => { root.bind-clicked(); }
+                    }
+                    Button {
+                        text: "重试连接";
+                        enabled: !root.busy && root.can-retry;
+                        clicked => { root.retry-clicked(); }
+                    }
+                    Button {
+                        text: "解除绑定";
+                        enabled: !root.busy && root.has-binding;
+                        clicked => { root.unbind-requested(); }
+                    }
+                }
+
+                Text {
+                    text: root.feedback-text;
+                    wrap: word-wrap;
+                    visible: root.show-feedback;
+                    color: Palette.accent-background;
+                }
+            }
+
+            Rectangle {
+                height: 1px;
+                background: Palette.border;
+                vertical-stretch: 0;
+            }
+
+            VerticalLayout {
+                spacing: 7px;
+
+                CheckBox {
+                    text: "登录系统时启动";
+                    checked <=> root.autostart;
+                    enabled: !root.busy;
+                    toggled => { root.autostart-toggled(root.autostart); }
+                }
+
+                CheckBox {
+                    text: "暂停通知弹窗（继续同步）";
+                    checked <=> root.paused;
+                    enabled: !root.busy;
+                    toggled => { root.pause-toggled(root.paused); }
+                }
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+
+                    Button {
+                        text: "打开 OA";
+                        enabled: root.has-binding;
+                        clicked => { root.open-home(); }
+                    }
+                    Button {
+                        text: "发送系统测试通知";
+                        enabled: !root.busy;
+                        clicked => { root.test-notification(); }
+                    }
+                    Button {
+                        text: "导出诊断";
+                        clicked => { root.export-diagnostics(); }
+                    }
+                    Button {
+                        text: "退出";
+                        clicked => { root.exit-clicked(); }
+                    }
+                }
+
+                Text {
+                    text: root.version-text;
+                    color: Palette.foreground;
+                    opacity: 0.65;
+                }
+            }
+        }
+    }
+
+    about-popup := PopupWindow {
+        width: 320px;
+        height: 200px;
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+
+        Rectangle {
+            background: Palette.background;
+            border-color: Palette.border;
+            border-width: 1px;
+
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                Text { text: "关于 " + root.version-text; }
+                AboutSlint {}
+                Button {
+                    text: "关闭";
+                    clicked => { about-popup.close(); }
+                }
+            }
+        }
+    }
+
+    if root.confirming-unbind : Rectangle {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        background: #00000055;
+
+        Rectangle {
+            x: (root.width - self.width) / 2;
+            y: (root.height - self.height) / 2;
+            width: min(root.width - 48px, 380px);
+            height: 158px;
+            background: Palette.background;
+            border-radius: 10px;
+            border-width: 1px;
+            border-color: Palette.border;
+
+            VerticalLayout {
+                padding: 20px;
+                spacing: 14px;
+
+                Text {
+                    text: "解除绑定";
+                    font-weight: 600;
+                }
+                Text {
+                    text: "解除后此设备将停止接收通知。";
+                    wrap: word-wrap;
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: end;
+
+                    Button {
+                        text: "取消";
+                        clicked => { root.unbind-cancelled(); }
+                    }
+                    Button {
+                        text: "解除绑定";
+                        primary: true;
+                        enabled: !root.busy;
+                        clicked => { root.unbind-confirmed(); }
+                    }
+                }
+            }
+        }
+    }
+}
+
+export component AppTray inherits SystemTrayIcon {
+    in property <string> status-text: "尚未绑定";
+    in property <bool> has-binding: false;
+    in property <bool> paused: false;
+
+    icon: @image-url("assets/tray-icon.png");
+    tooltip: "nkyoa 通知 · " + status-text;
+    visible: true;
+
+    callback open-home();
+    callback show-settings();
+    callback toggle-pause();
+    callback test-notification();
+    callback exit-requested();
+
+    clicked => { root.show-settings(); }
+
+    Menu {
+        MenuItem {
+            title: root.status-text;
+            enabled: false;
+        }
+        MenuItem {
+            title: "打开 OA";
+            enabled: root.has-binding;
+            activated => { root.open-home(); }
+        }
+        MenuSeparator { }
+        MenuItem {
+            title: "设置";
+            activated => { root.show-settings(); }
+        }
+        MenuItem {
+            title: root.paused ? "恢复弹窗" : "暂停弹窗";
+            activated => { root.toggle-pause(); }
+        }
+        MenuItem {
+            title: "发送本机测试通知";
+            activated => { root.test-notification(); }
+        }
+        MenuSeparator { }
+        MenuItem {
+            title: "退出";
+            activated => { root.exit-requested(); }
+        }
+    }
+}

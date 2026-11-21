@@ -1,0 +1,968 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "NKY.OA | v1 — Desktop Notification Protocol v1",
+    "version": "1.0.0",
+    "description": "从服务端契约文档导出的桌面通知协议子集（派生文件，不得手改）"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5217/"
+    }
+  ],
+  "paths": {
+    "/api/desktop/v1/devices/register": {
+      "post": {
+        "tags": [
+          "desktop"
+        ],
+        "summary": "HTTP: POST /api/desktop/v1/devices/register",
+        "operationId": "post_api_desktop_v1_devices_register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DesktopRegisterRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfDesktopRegisterReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "pairingAuth": []
+          }
+        ]
+      }
+    },
+    "/api/desktop/v1/device": {
+      "get": {
+        "tags": [
+          "desktop"
+        ],
+        "summary": "HTTP: GET /api/desktop/v1/device",
+        "operationId": "get_api_desktop_v1_device",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfDesktopDeviceView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "deviceAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "desktop"
+        ],
+        "summary": "HTTP: DELETE /api/desktop/v1/device",
+        "operationId": "delete_api_desktop_v1_device",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfDesktopRevokeDeviceReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "deviceAuth": []
+          }
+        ]
+      }
+    },
+    "/api/desktop/v1/notifications": {
+      "get": {
+        "tags": [
+          "desktop"
+        ],
+        "summary": "HTTP: GET /api/desktop/v1/notifications",
+        "operationId": "get_api_desktop_v1_notifications",
+        "parameters": [
+          {
+            "name": "afterSequence",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfDesktopFeedView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "deviceAuth": []
+          }
+        ]
+      }
+    },
+    "/api/desktop/v1/acks": {
+      "post": {
+        "tags": [
+          "desktop"
+        ],
+        "summary": "HTTP: POST /api/desktop/v1/acks",
+        "operationId": "post_api_desktop_v1_acks",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DesktopAckRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfDesktopAckReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "deviceAuth": []
+          }
+        ]
+      }
+    },
+    "/api/desktop/v1/resync": {
+      "post": {
+        "tags": [
+          "desktop"
+        ],
+        "summary": "HTTP: POST /api/desktop/v1/resync",
+        "operationId": "post_api_desktop_v1_resync",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOfDesktopResyncReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "deviceAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DesktopRegisterRequest": {
+        "required": [
+          "installationId",
+          "deviceName",
+          "platform",
+          "architecture",
+          "clientVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "installationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceName": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "architecture": {
+            "type": "string"
+          },
+          "clientVersion": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseOfDesktopRegisterReceipt": {
+        "required": [
+          "success",
+          "data",
+          "error",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "业务是否成功：失败档不走本信封（错误统一走 problem+json），成功时为 true"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "成功时的业务负载",
+                "$ref": "#/components/schemas/DesktopRegisterReceipt"
+              }
+            ]
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户可读的失败文案；成功档为 null（失败响应不走本信封，字段保留以维持契约形状）"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
+          }
+        },
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ApiResponseOfDesktopDeviceView": {
+        "required": [
+          "success",
+          "data",
+          "error",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "业务是否成功：失败档不走本信封（错误统一走 problem+json），成功时为 true"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "成功时的业务负载",
+                "$ref": "#/components/schemas/DesktopDeviceView"
+              }
+            ]
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户可读的失败文案；成功档为 null（失败响应不走本信封，字段保留以维持契约形状）"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
+          }
+        },
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+      },
+      "ApiResponseOfDesktopRevokeDeviceReceipt": {
+        "required": [
+          "success",
+          "data",
+          "error",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "业务是否成功：失败档不走本信封（错误统一走 problem+json），成功时为 true"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "成功时的业务负载",
+                "$ref": "#/components/schemas/DesktopRevokeDeviceReceipt"
+              }
+            ]
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户可读的失败文案；成功档为 null（失败响应不走本信封，字段保留以维持契约形状）"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
+          }
+        },
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+      },
+      "ApiResponseOfDesktopFeedView": {
+        "required": [
+          "success",
+          "data",
+          "error",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "业务是否成功：失败档不走本信封（错误统一走 problem+json），成功时为 true"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "成功时的业务负载",
+                "$ref": "#/components/schemas/DesktopFeedView"
+              }
+            ]
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户可读的失败文案；成功档为 null（失败响应不走本信封，字段保留以维持契约形状）"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
+          }
+        },
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+      },
+      "DesktopAckRequest": {
+        "required": [
+          "receivedThroughSequence"
+        ],
+        "type": "object",
+        "properties": {
+          "receivedThroughSequence": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseOfDesktopAckReceipt": {
+        "required": [
+          "success",
+          "data",
+          "error",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "业务是否成功：失败档不走本信封（错误统一走 problem+json），成功时为 true"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "成功时的业务负载",
+                "$ref": "#/components/schemas/DesktopAckReceipt"
+              }
+            ]
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户可读的失败文案；成功档为 null（失败响应不走本信封，字段保留以维持契约形状）"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
+          }
+        },
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+      },
+      "ApiResponseOfDesktopResyncReceipt": {
+        "required": [
+          "success",
+          "data",
+          "error",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "业务是否成功：失败档不走本信封（错误统一走 problem+json），成功时为 true"
+          },
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "成功时的业务负载",
+                "$ref": "#/components/schemas/DesktopResyncReceipt"
+              }
+            ]
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "用户可读的失败文案；成功档为 null（失败响应不走本信封，字段保留以维持契约形状）"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
+          }
+        },
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+      },
+      "DesktopRegisterReceipt": {
+        "required": [
+          "protocolVersion",
+          "userId",
+          "deviceId",
+          "deviceToken",
+          "initialSequence",
+          "pollIntervalSeconds",
+          "maxPageSize",
+          "serverTime",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "protocolVersion": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceToken": {
+            "type": "string"
+          },
+          "initialSequence": {
+            "type": "string"
+          },
+          "pollIntervalSeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "maxPageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DesktopPendingSummary"
+          }
+        }
+      },
+      "DesktopDeviceView": {
+        "required": [
+          "protocolVersion",
+          "userId",
+          "deviceId",
+          "deviceName",
+          "initialSequence",
+          "pollIntervalSeconds",
+          "maxPageSize",
+          "serverTime"
+        ],
+        "type": "object",
+        "properties": {
+          "protocolVersion": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deviceName": {
+            "type": "string"
+          },
+          "initialSequence": {
+            "type": "string"
+          },
+          "pollIntervalSeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "maxPageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DesktopRevokeDeviceReceipt": {
+        "required": [
+          "revoked"
+        ],
+        "type": "object",
+        "properties": {
+          "revoked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DesktopFeedView": {
+        "required": [
+          "protocolVersion",
+          "serverTime",
+          "headSequence",
+          "purgedThroughSequence",
+          "nextSequence",
+          "hasMore",
+          "items",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "protocolVersion": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "headSequence": {
+            "type": "string"
+          },
+          "purgedThroughSequence": {
+            "type": "string"
+          },
+          "nextSequence": {
+            "type": "string"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DesktopFeedItem"
+            }
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DesktopPendingSummary"
+          }
+        }
+      },
+      "DesktopAckReceipt": {
+        "required": [
+          "ackedSequence"
+        ],
+        "type": "object",
+        "properties": {
+          "ackedSequence": {
+            "type": "string"
+          }
+        }
+      },
+      "DesktopResyncReceipt": {
+        "required": [
+          "initialSequence",
+          "serverTime",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "initialSequence": {
+            "type": "string"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DesktopPendingSummary"
+          }
+        }
+      },
+      "DesktopPendingSummary": {
+        "required": [
+          "pendingTaskCount"
+        ],
+        "type": "object",
+        "properties": {
+          "pendingTaskCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "DesktopFeedItem": {
+        "required": [
+          "id",
+          "sequence",
+          "scenario",
+          "occurredAt",
+          "expiresAt",
+          "title",
+          "body",
+          "target",
+          "payloadVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sequence": {
+            "type": "string"
+          },
+          "scenario": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "payloadVersion": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "pairingAuth": {
+        "type": "http",
+        "description": "桌面通知绑定校验码（nky-pair-v1.<id>.<secret>）：仅设备注册端点。",
+        "scheme": "bearer",
+        "bearerFormat": "nky-pair-v1"
+      },
+      "deviceAuth": {
+        "type": "http",
+        "description": "桌面通知设备令牌（nky-device-v1.<id>.<secret>）：设备端点专用。",
+        "scheme": "bearer",
+        "bearerFormat": "nky-device-v1"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "data": {
+    "initialSequence": "9007199254740993",
+    "serverTime": "2026-11-20T00:00:00Z",
+    "summary": {
+      "pendingTaskCount": 0
+    }
+  },
+  "error": null,
+  "code": null
+}

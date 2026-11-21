@@ -1,0 +1,11 @@
+{
+  "exporterVersion": 1,
+  "protocolVersion": 1,
+  "pathPrefix": "/api/desktop/v1",
+  "pathCount": 5,
+  "sha256": "5c3e158b79b5dd3e043013b93b5a9f19e2df56fa8e1d22547c024d976a5461af",
+  "exportedAt": "2026-11-19T16:53:57.018Z",
+  "serverCommit": "1b70833049be7867e48542b04b5597e5e6882606",
+  "serverDirty": true,
+  "source": "contracts/NKY_OA.json"
+}

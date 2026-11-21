@@ -1,0 +1,29 @@
+{
+  "success": true,
+  "data": {
+    "protocolVersion": 1,
+    "serverTime": "2026-11-20T00:00:00Z",
+    "headSequence": "9007199254740993",
+    "purgedThroughSequence": "9007199254740992",
+    "nextSequence": "9007199254740993",
+    "hasMore": false,
+    "items": [
+      {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "sequence": "9007199254740993",
+        "scenario": "todo",
+        "occurredAt": "2026-11-20T00:00:00Z",
+        "expiresAt": "2026-11-21T00:00:00Z",
+        "title": "OA 待办提醒",
+        "body": "您有新的审批待办，请打开 OA 查看。",
+        "target": "oa-home",
+        "payloadVersion": 1
+      }
+    ],
+    "summary": {
+      "pendingTaskCount": 0
+    }
+  },
+  "error": null,
+  "code": null
+}

@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "protocolVersion": 1,
+    "userId": "00000000-0000-4000-8000-000000000002",
+    "deviceId": "00000000-0000-4000-8000-000000000003",
+    "deviceName": "办公电脑",
+    "initialSequence": "0",
+    "pollIntervalSeconds": 60,
+    "maxPageSize": 100,
+    "serverTime": "2026-11-20T00:00:00Z"
+  },
+  "error": null,
+  "code": null
+}
