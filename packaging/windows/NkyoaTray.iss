@@ -35,7 +35,15 @@ Source: "{#PayloadDir}\licenses\Slint-Royalty-free-2.0.md"; DestDir: "{app}\lice
 [Icons]
 Name: "{userprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; AppUserModelID: "{#Aumid}"; AppUserModelToastActivatorCLSID: "E82D235E-46BC-4018-A883-65AEBDE7E1BA"
 
+[InstallDelete]
+; 改名前的旧快捷方式，以及脚本安装方式留下的卸载脚本，避免残留或双入口
+Type: files; Name: "{userprograms}\nkyoa 桌面通知 (Rust).lnk"
+Type: files; Name: "{app}\Install-NkyoaTray.ps1"
+
 [Registry]
+; Install-NkyoaTray.ps1 会在同一位置注册自己的卸载项；由 Inno 接管时必须移除，
+; 否则「设置 → 应用」会同时出现两个入口，其中一个指向已被覆盖的 unins000.exe。
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\NKYOA.Tray.Rust"; Flags: deletekey
 Root: HKCU; Subkey: "Software\Classes\AppUserModelId\{#Aumid}"; ValueType: string; ValueName: "DisplayName"; ValueData: "{#AppName}"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\{#Protocol}"; ValueType: string; ValueData: "URL:{#AppName}"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\{#Protocol}"; ValueType: string; ValueName: "URL Protocol"

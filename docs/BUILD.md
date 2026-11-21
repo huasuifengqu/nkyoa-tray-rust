@@ -45,7 +45,9 @@ cargo test --workspace --locked
 
 ### 使用 PowerShell 脚本安装
 
-脚本适用于直接使用 ZIP 或发布目录进行维护的场景。通过 EXE 安装的版本使用 Windows 应用列表卸载。
+脚本适用于直接使用 ZIP 或发布目录进行维护的场景。安装会写入当前用户的卸载项，
+因此与 EXE 安装版一样出现在「设置 → 应用 → 已安装的应用」，可直接在那里卸载。
+安装时会把脚本副本放进安装目录，源发布目录删除后卸载入口仍然有效。
 
 ```powershell
 ./packaging/windows/Install-NkyoaTray.ps1 -PackageDirectory artifacts/win-x64
