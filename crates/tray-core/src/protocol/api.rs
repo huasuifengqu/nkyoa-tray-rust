@@ -23,9 +23,9 @@ use super::transport::{
 };
 use super::validation;
 use super::{
-    AUTHORIZATION_SCHEME, CSRF_HEADER_NAME, CSRF_HEADER_VALUE, MAX_ACK_BODY_BYTES,
-    MAX_FEED_RESPONSE_BYTES, MAX_PAGE_SIZE, MAX_REGISTER_BODY_BYTES, PATH_ACKS, PATH_DEVICE,
-    PATH_NOTIFICATIONS, PATH_REGISTER, PATH_RESYNC, PATH_REVOKE_SELF,
+    AUTHORIZATION_SCHEME, CSRF_HEADER_NAME, CSRF_HEADER_VALUE, JSON_CONTENT_TYPE,
+    MAX_ACK_BODY_BYTES, MAX_FEED_RESPONSE_BYTES, MAX_PAGE_SIZE, MAX_REGISTER_BODY_BYTES, PATH_ACKS,
+    PATH_DEVICE, PATH_NOTIFICATIONS, PATH_REGISTER, PATH_RESYNC, PATH_REVOKE_SELF,
 };
 
 const DEFAULT_RESPONSE_BYTES: usize = 16 * 1024;
@@ -120,6 +120,9 @@ impl DesktopApi {
         ];
         if method != "GET" {
             headers.push((CSRF_HEADER_NAME.to_owned(), CSRF_HEADER_VALUE.to_owned()));
+        }
+        if body.is_some() {
+            headers.push(("Content-Type".to_owned(), JSON_CONTENT_TYPE.to_owned()));
         }
 
         let request = HttpRequest {

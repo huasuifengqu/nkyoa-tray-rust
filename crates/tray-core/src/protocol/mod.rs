@@ -39,6 +39,10 @@ pub const PATH_REVOKE_SELF: &str = "/api/desktop/v1/device";
 pub const CSRF_HEADER_NAME: &str = "X-Requested-With";
 pub const CSRF_HEADER_VALUE: &str = "XMLHttpRequest";
 
+/// 带 JSON 体的写请求必须声明内容类型：服务端端点带 JSON 内容类型约束，
+/// 缺这个头时路由匹配不到端点，会落到 /api 兜底 404。
+pub const JSON_CONTENT_TYPE: &str = "application/json";
+
 /// Authorization 头携带两层凭证；总长度上限 256 字符。
 pub const AUTHORIZATION_SCHEME: &str = "Bearer";
 pub const MAX_AUTHORIZATION_LENGTH: usize = 256;

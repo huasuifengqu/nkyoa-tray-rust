@@ -253,6 +253,10 @@ async fn contract_hash_and_golden_requests_match_the_server_snapshot() {
         } else {
             assert_eq!(call.header(CSRF_HEADER_NAME), Some(CSRF_HEADER_VALUE));
         }
+        if call.body.is_some() {
+            // 服务端端点带 JSON 内容类型约束：缺 Content-Type 会匹配不到端点而落兜底 404。
+            assert_eq!(call.header("Content-Type"), Some(JSON_CONTENT_TYPE));
+        }
         let authorization = call.header("Authorization").unwrap();
         assert!(authorization.starts_with("Bearer "));
 
