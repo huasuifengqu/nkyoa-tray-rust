@@ -103,6 +103,8 @@ impl SystemNotifier for WindowsNotifier {
 }
 
 /// 生成 Toast XML；只有合法配置标识才写入协议激活属性。
+///
+/// `duration="long"` 让横幅停留约 25 秒；Windows 不提供任意秒数的调节方式。
 pub fn build_toast_xml(popup: &Popup) -> String {
     let mut attributes = String::new();
     if let Some(profile_id) = &popup.profile_id
@@ -115,7 +117,7 @@ pub fn build_toast_xml(popup: &Popup) -> String {
         );
     }
     format!(
-        r#"<toast{attributes}><visual><binding template="ToastGeneric"><text>{}</text><text>{}</text></binding></visual></toast>"#,
+        r#"<toast duration="long"{attributes}><visual><binding template="ToastGeneric"><text>{}</text><text>{}</text></binding></visual></toast>"#,
         escape_xml(&popup.title),
         escape_xml(&popup.body)
     )
@@ -172,6 +174,7 @@ mod tests {
             profile_id: Some(binding.profile_id().to_owned()),
         };
         let xml = build_toast_xml(&popup);
+        assert!(xml.contains(r#"<toast duration="long""#));
         assert!(xml.contains(r#"activationType="protocol""#));
         let quote = '"';
         let expected = format!(
@@ -187,6 +190,8 @@ mod tests {
             profile_id: Some("https://attacker.test/".to_owned()),
             ..popup
         };
-        assert!(!build_toast_xml(&tampered).contains("launch"));
+        let tampered_xml = build_toast_xml(&tampered);
+        assert!(!tampered_xml.contains("launch"));
+        assert!(tampered_xml.contains(r#"<toast duration="long""#));
     }
 }

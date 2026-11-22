@@ -66,7 +66,7 @@ tray-core
 ## 安全要点
 
 - 错误对象只含问题分类，不含服务器 `detail`；`Debug` 对令牌与配对码脱敏。
-- Toast XML 只写 AUMID、受控协议 URI 与转义后的标题/正文。
+- Toast XML 只写固定 `duration="long"`、AUMID、受控协议 URI 与转义后的标题/正文。
 - 协议 URI 只接受 64 位小写十六进制；管道帧最多 69 字节、2 秒超时。
 - 凭据读写通过系统 API，内存副本用 `zeroize` 清零；`DeviceToken`/`PairingCode`
   在 Drop 时清零，凭据 blob 与配对码的临时 String 也在使用后清零。
