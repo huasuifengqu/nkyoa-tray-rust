@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5217/"
+      "url": "http://127.0.0.1:49773"
     }
   ],
   "paths": {
@@ -357,7 +357,8 @@
           "deviceName",
           "platform",
           "architecture",
-          "clientVersion"
+          "clientVersion",
+          "previewCapable"
         ],
         "type": "object",
         "properties": {
@@ -376,6 +377,9 @@
           },
           "clientVersion": {
             "type": "string"
+          },
+          "previewCapable": {
+            "type": "boolean"
           }
         }
       },
@@ -418,7 +422,7 @@
             "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
           }
         },
-        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\r\n     - 200 + success=true  → 传输层直接返回 data；\r\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\r\n       前端按状态码与 code 判定；\r\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\r\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\r\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\r\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\r\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\r\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
       },
       "ProblemDetails": {
         "type": "object",
@@ -497,7 +501,7 @@
             "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
           }
         },
-        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\r\n     - 200 + success=true  → 传输层直接返回 data；\r\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\r\n       前端按状态码与 code 判定；\r\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\r\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\r\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\r\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\r\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\r\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
       },
       "ApiResponseOfDesktopRevokeDeviceReceipt": {
         "required": [
@@ -538,7 +542,7 @@
             "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
           }
         },
-        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\r\n     - 200 + success=true  → 传输层直接返回 data；\r\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\r\n       前端按状态码与 code 判定；\r\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\r\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\r\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\r\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\r\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\r\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
       },
       "ApiResponseOfDesktopFeedView": {
         "required": [
@@ -579,7 +583,7 @@
             "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
           }
         },
-        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\r\n     - 200 + success=true  → 传输层直接返回 data；\r\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\r\n       前端按状态码与 code 判定；\r\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\r\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\r\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\r\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\r\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\r\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
       },
       "DesktopAckRequest": {
         "required": [
@@ -631,7 +635,7 @@
             "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
           }
         },
-        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\r\n     - 200 + success=true  → 传输层直接返回 data；\r\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\r\n       前端按状态码与 code 判定；\r\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\r\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\r\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\r\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\r\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\r\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
       },
       "ApiResponseOfDesktopResyncReceipt": {
         "required": [
@@ -672,7 +676,7 @@
             "description": "机器可读标识（MustChangePassword / RateLimited 等），供前端分支判定"
           }
         },
-        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\n     - 200 + success=true  → 传输层直接返回 data；\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\n       前端按状态码与 code 判定；\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
+        "description": "    HTTP API 统一成功信封（前端 `src/api/http.ts` 按此解包）：\r\n     - 200 + success=true  → 传输层直接返回 data；\r\n     - 失败档不走信封：一律 `application/problem+json`（status/code/traceId，见 ProblemDetails），\r\n       前端按状态码与 code 判定；\r\n     - 文件流端点（导出/附件下载/人机验证挑战）成功时不走信封，原样返回流。\r\n    序列化走 ASP.NET Core Web 默认的全局 camelCase 约定（枚举成员转 camelCase 字符串的定制见 ApiHost 装配的 ConfigureHttpJsonOptions）。\r\n    位置参数不设默认值（尽管 Data/Error/Code 语义上都可缺省）：.NET 10 的 STJ schema 导出器\r\n（JsonSchemaExporter，构建期/运行期 OpenAPI 文档生成共用）对「泛型位置参数带默认值、\r\nT 闭为值类型」的 record 会抛 JsonException（ApiResponse&lt;bool&gt; 即触发），构建期文档生成因此\r\n整体失败。缺省语义由下方静态工厂承载，构造点收在本文件内，JSON 形状不受影响。"
       },
       "DesktopRegisterReceipt": {
         "required": [

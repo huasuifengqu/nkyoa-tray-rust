@@ -79,6 +79,8 @@ pub struct RegisterRequest {
     pub platform: String,
     pub architecture: String,
     pub client_version: String,
+    /// 能力声明：本客户端支持流程标题/流转意见预览（旧客户端不传，服务端只回通用文案）
+    pub preview_capable: bool,
 }
 
 impl RegisterRequest {
@@ -95,6 +97,7 @@ impl RegisterRequest {
             platform: platform.into(),
             architecture: architecture.into(),
             client_version: client_version.into(),
+            preview_capable: super::PREVIEW_CAPABLE,
         }
     }
 
@@ -125,6 +128,7 @@ impl RegisterRequest {
             platform: self.platform.clone(),
             architecture: self.architecture.clone(),
             client_version: self.client_version.clone(),
+            preview_capable: self.preview_capable,
         })
     }
 }

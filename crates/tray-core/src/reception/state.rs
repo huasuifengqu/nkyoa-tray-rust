@@ -103,6 +103,23 @@ impl ClientState {
     }
 }
 
+/// 落盘待处理页的通用标题：服务端预览标题/流转意见只允许存在于内存与系统通知显示路径。
+pub const PERSISTED_TITLE: &str = "OA 通知";
+
+/// 落盘待处理页的通用正文（与服务端降级文案同一口径）。
+pub const PERSISTED_BODY: &str = "请打开 OA 查看。";
+
+/// 生成可落盘的条目：保留序号、场景与时间，标题/正文换成通用提示。
+/// 这样流程标题与「姓名：意见」不会进入 `state.json`、诊断导出或故障副本；
+/// 异常重启后按已保存进度恢复时，未展示条目只呈现通用提示。
+pub fn persisted_item(item: &FeedItem) -> FeedItem {
+    FeedItem {
+        title: PERSISTED_TITLE.to_owned(),
+        body: PERSISTED_BODY.to_owned(),
+        ..item.clone()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PendingPage {

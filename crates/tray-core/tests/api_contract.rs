@@ -269,6 +269,9 @@ async fn contract_hash_and_golden_requests_match_the_server_snapshot() {
             assert!(authorization.starts_with("Bearer nky-pair-v1."));
             let body: Value = serde_json::from_slice(call.body.as_ref().unwrap()).unwrap();
             assert_eq!(body["deviceName"], "办公电脑");
+            assert_eq!(body["clientVersion"], "1.0.0");
+            // v1 新客户端声明预览能力；服务端只对声明的设备下发流程标题/流转意见
+            assert_eq!(body["previewCapable"], true);
             assert_eq!(
                 Uuid::parse_str(body["installationId"].as_str().unwrap()).unwrap(),
                 installation

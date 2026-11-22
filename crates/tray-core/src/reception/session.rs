@@ -10,14 +10,14 @@ use time::OffsetDateTime;
 use tokio_util::sync::CancellationToken;
 
 use crate::protocol::error::{ApiFailure, ApiIssue};
-use crate::protocol::{Binding, NotificationApi, validation};
+use crate::protocol::{Binding, FeedItem, NotificationApi, validation};
 use crate::protocol::{DEFAULT_PAGE_SIZE, MAX_POPUPS_PER_PAGE, POLL_INTERVAL_SECONDS};
 
 use super::contracts::{
     ClientError, ClientPhase, ClientStateStore, ClientStatus, DeliveryReport, DeliveryResult,
     Popup, RecoveryReason, SystemNotifier,
 };
-use super::state::{ClientState, PendingPage, ResyncReason, StateRead};
+use super::state::{ClientState, PendingPage, ResyncReason, StateRead, persisted_item};
 
 /// 可注入时钟；测试使用固定时间。
 pub trait Clock: Send + Sync {
@@ -196,7 +196,8 @@ impl ReceptionSession {
         *state = Some(current.clone());
 
         if current.pending.is_some() {
-            self.drain(&mut current, cancel).await?;
+            // 落盘页（含异常重启后的恢复页）只有通用文案，预览正文不随磁盘往返
+            self.drain(&mut current, None, cancel).await?;
             *state = Some(current);
             self.connected();
             self.has_more = true;
@@ -240,15 +241,17 @@ impl ReceptionSession {
         if !feed.items.is_empty() {
             current.through = feed.next_sequence;
             current.ack_pending = true;
+            // 预览文案（流程标题与「姓名：意见」）只留在本次内存页与系统通知路径；
+            // 落盘待处理页统一替换为通用提示，异常重启后按已保存进度恢复。
             current.pending = Some(PendingPage {
-                items: feed.items.clone(),
+                items: feed.items.iter().map(persisted_item).collect(),
                 processed: 0,
                 accepted: 0,
                 suppress: (self.is_paused)(),
             });
             self.save(&current, cancel).await?;
             *state = Some(current.clone());
-            self.drain(&mut current, cancel).await?;
+            self.drain(&mut current, Some(&feed.items), cancel).await?;
             *state = Some(current);
         } else if corrupt {
             self.save(&current, cancel).await?;
@@ -345,12 +348,22 @@ impl ReceptionSession {
         )))
     }
 
+    /// 展示并消费一页：`live` 是本次进程刚从服务端取回的条目（可能带预览文案）；
+    /// `state.pending` 里的条目始终是通用文案。两者序号必须一致，否则只用落盘页。
     async fn drain(
         &mut self,
         state: &mut ClientState,
+        live: Option<&[FeedItem]>,
         cancel: &CancellationToken,
     ) -> Result<(), ClientError> {
         let mut page = state.pending.clone().expect("待处理页存在");
+        let live = live.filter(|items| {
+            items.len() == page.items.len()
+                && items
+                    .iter()
+                    .zip(&page.items)
+                    .all(|(live, stored)| live.sequence == stored.sequence)
+        });
         if !page.suppress && (self.is_paused)() {
             page.suppress = true;
             state.pending = Some(page.clone());
@@ -409,7 +422,7 @@ impl ReceptionSession {
                     profile_id: Some(self.binding.profile_id().to_owned()),
                 }
             } else {
-                let item = &page.items[index];
+                let item = live.map_or(&page.items[index], |items| &items[index]);
                 Popup {
                     title: item.title.clone(),
                     body: item.body.clone(),

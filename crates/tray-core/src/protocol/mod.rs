@@ -85,6 +85,10 @@ pub const DEADLINE_DISPLAY_TTL_MINUTES: i32 = 60;
 /// 单页恢复最多弹出 3 条，其余合并提示。
 pub const MAX_POPUPS_PER_PAGE: i32 = 3;
 
+/// 客户端能力声明：本版本已支持流程标题与流转意见预览。
+/// 在设备注册时声明；服务端只对声明的设备下发预览文案，旧客户端继续收通用文案。
+pub const PREVIEW_CAPABLE: bool = true;
+
 /// 失败退避阶梯（秒），实际取值再加抖动；401/撤销不进退避直接停。
 pub const BACKOFF_SECONDS: [u64; 6] = [5, 15, 30, 60, 120, 300];
 

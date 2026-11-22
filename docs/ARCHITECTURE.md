@@ -48,6 +48,9 @@ tray-core
 - 状态目录：`%LOCALAPPDATA%\Nkyoa\Tray.Rust\state\<profileId>\state.json`。
 - 安装标识：`...\state\installation-id`，并发首次创建以硬链接保证唯一赢家。
 - 写入：同目录临时文件 + `sync_all` + 原子替换；损坏副本只保留固定标记。
+- 预览文案（流程标题与「姓名：意见」）只存在于内存与系统通知显示路径：待处理页落盘前
+  把 `title/body` 统一替换为通用提示（`OA 通知` / `请打开 OA 查看。`），诊断导出与故障
+  副本同样不含预览明文；异常重启按保存进度恢复，未展示条目只显示通用提示。
 - `resyncPending` 只允许 `null/0/1`；未来版本（`version > 1`）拒绝覆盖。
 - 凭据 blob 与 .NET 版同形；`profileId` 计算与 .NET `AbsoluteUri` 输入逐字一致。
 

@@ -12,7 +12,7 @@ use tray_core::protocol::dto::{
 };
 use tray_core::protocol::{ApiFailure, ApiIssue, Binding, NotificationApi, PairingCode};
 use tray_core::reception::session::{Clock, ReceptionSession};
-use tray_core::reception::state::{ClientState, StateRead};
+use tray_core::reception::state::{ClientState, PERSISTED_BODY, PERSISTED_TITLE, StateRead};
 use tray_core::{
     ClientError, ClientStateStore, ClientStatus, CredentialStore, DeliveryReport, DeliveryResult,
     DeviceRegistration, DeviceToken, Popup, RecoveryReason, StoreError, SystemNotifier,
@@ -25,6 +25,8 @@ fn now() -> OffsetDateTime {
 
 const USER: Uuid = Uuid::from_u128(0x0000_0000_0000_4000_8000_0000_0000_0002);
 const DEVICE: Uuid = Uuid::from_u128(0x0000_0000_0000_4000_8000_0000_0000_0003);
+const PREVIEW_TITLE: &str = "关于开展年度档案整理工作的通知";
+const PREVIEW_COMMENT: &str = "张三：请按制度办理";
 
 fn bound() -> Binding {
     Binding::new(
@@ -59,6 +61,10 @@ struct RigData {
     result: DeliveryResult,
     calls: Vec<String>,
     popup_sizes: Vec<i32>,
+    /// 每次弹窗的标题与正文（验证预览文案只在内存/系统通知路径）
+    popups: Vec<(String, String)>,
+    /// feed 是否返回带流程标题与意见的预览文案
+    preview: bool,
     notifications: i32,
     status: Option<ClientStatus>,
     initial: i64,
@@ -82,6 +88,8 @@ impl Default for RigData {
             result: DeliveryResult::Accepted,
             calls: Vec::new(),
             popup_sizes: Vec::new(),
+            popups: Vec::new(),
+            preview: false,
             notifications: 0,
             status: None,
             initial: 0,
@@ -221,8 +229,16 @@ impl NotificationApi for Rig {
                 } else {
                     now() + time::Duration::hours(1)
                 },
-                title: "OA".to_owned(),
-                body: "Test".to_owned(),
+                title: if data.preview {
+                    PREVIEW_TITLE.to_owned()
+                } else {
+                    "OA".to_owned()
+                },
+                body: if data.preview {
+                    format!("{PREVIEW_TITLE}\n{PREVIEW_COMMENT}")
+                } else {
+                    "Test".to_owned()
+                },
                 target: "oa-home".to_owned(),
                 payload_version: 1,
             })
@@ -301,6 +317,7 @@ impl SystemNotifier for Rig {
         {
             let mut data = self.data();
             data.popup_sizes.push(popup.event_count);
+            data.popups.push((popup.title.clone(), popup.body.clone()));
             data.notifications += 1;
         }
         self.trigger("notify-after")?;
@@ -431,6 +448,50 @@ async fn restart_resumes_the_durable_page() {
         assert_eq!(data.state.as_ref().unwrap().through.0, 1);
         assert!(data.state.as_ref().unwrap().pending.is_none());
     }
+}
+
+#[tokio::test]
+async fn preview_text_is_displayed_but_never_persisted() {
+    // checkpoint 故障在第一条弹窗后的检查点保存处中断：内存页仍带预览，落盘页必须已脱敏
+    let rig = Rig::new(Some("checkpoint"));
+    rig.data().preview = true;
+    rig.data().event_count = 2;
+    assert_failed(rig.step().await);
+    {
+        let data = rig.data();
+        assert_eq!(data.popups[0].0, PREVIEW_TITLE, "弹窗应使用服务端预览标题");
+        assert!(
+            data.popups[0].1.contains(PREVIEW_COMMENT),
+            "弹窗应包含上一节点意见"
+        );
+        let pending = data.state.as_ref().unwrap().pending.as_ref().unwrap();
+        assert!(
+            pending
+                .items
+                .iter()
+                .all(|item| item.title == PERSISTED_TITLE && item.body == PERSISTED_BODY),
+            "落盘待处理页必须只保留通用提示"
+        );
+        assert!(
+            !format!("{:?}", data.state).contains(PREVIEW_TITLE)
+                && !format!("{:?}", data.state).contains(PREVIEW_COMMENT),
+            "内存状态诊断文本不得带出预览文案"
+        );
+    }
+
+    // 模拟异常重启：未展示的落盘条目只按通用提示弹出
+    rig.data().calls.clear();
+    rig.step().await.unwrap();
+    let data = rig.data();
+    assert!(data.popups.len() > 1, "重启后应继续展示剩余条目");
+    assert!(
+        data.popups
+            .iter()
+            .skip(1)
+            .all(|(title, body)| { title == PERSISTED_TITLE && body == PERSISTED_BODY }),
+        "重启后的条目不得带出预览明文"
+    );
+    assert!(data.state.as_ref().unwrap().pending.is_none());
 }
 
 #[tokio::test]

@@ -15,7 +15,7 @@ use crate::protocol::Binding;
 use crate::protocol::error::{ApiFailure, ApiIssue, StoreError};
 
 use super::contracts::{ClientError, ClientStateStore};
-use super::state::{ClientState, StateRead, validate};
+use super::state::{ClientState, StateRead, persisted_item, validate};
 
 const MAX_STATE_BYTES: u64 = 1024 * 1024;
 const INSTALLATION_ID_BYTES: usize = 36;
@@ -140,7 +140,10 @@ impl ClientStateStore for JsonClientStateStore {
             return Err(ClientError::Cancelled);
         }
         validate(state).map_err(ClientError::Api)?;
-        let bytes = serde_json::to_vec(state).map_err(|error| {
+        // 防御性收口：即使调用方把预览文案放进了内存状态，磁盘上也只出现通用提示。
+        // 标题与流转意见只允许存在于内存及系统通知显示路径（方案 §4）。
+        let persisted = persisted_copy(state);
+        let bytes = serde_json::to_vec(&persisted).map_err(|error| {
             ClientError::Storage(StoreError::new(format!("状态序列化失败：{error}")))
         })?;
         if bytes.len() as u64 > MAX_STATE_BYTES {
@@ -153,6 +156,17 @@ impl ClientStateStore for JsonClientStateStore {
         }
         write_atomic(&self.state_path(binding), &bytes).map_err(ClientError::Storage)
     }
+}
+
+/// 落盘副本：待处理页条目的标题/正文统一替换为通用提示。
+fn persisted_copy(state: &ClientState) -> ClientState {
+    let mut copy = state.clone();
+    if let Some(page) = &mut copy.pending {
+        for item in &mut page.items {
+            *item = persisted_item(item);
+        }
+    }
+    copy
 }
 
 enum StateFile {

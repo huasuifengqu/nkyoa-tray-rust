@@ -5,6 +5,9 @@
   `npm run contracts:desktop-export` 从 `contracts/NKY_OA.json` 生成。
 - 导入清单：`contracts/source-manifest.json`（协议版本 1、SHA-256、导出器版本、
   来源服务器提交号与干净/未提交状态）。
+- 本轮快照含注册能力位 `previewCapable`（服务端提交 `85410f3`、`serverDirty=true`）：
+  客户端注册固定声明 `true`；流程标题与流转意见只用于内存展示与系统通知，
+  待处理页落盘前统一替换为通用提示。
 - 黄金样本：`contracts/golden/*.json`，来自服务端提交 `5465d83` 的 HTTP 管线与临时
   PostgreSQL 数据库；样本中的 ID、时间、请求追踪号和令牌已替换为固定测试值。
 

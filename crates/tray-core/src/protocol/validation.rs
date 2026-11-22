@@ -67,7 +67,7 @@ pub fn items(items: &[FeedItem], after: i64, through: i64) -> Result<(), ApiFail
                 && SCENARIO_KEYS.contains(&item.scenario.as_str())
                 && item.target == "oa-home"
                 && valid_text(&item.title, 256)
-                && valid_text(&item.body, 2048),
+                && valid_body(&item.body, 2048),
         )?;
         previous = item.sequence.0;
     }
@@ -76,6 +76,14 @@ pub fn items(items: &[FeedItem], after: i64, through: i64) -> Result<(), ApiFail
 
 pub fn valid_text(value: &str, max: usize) -> bool {
     !value.trim().is_empty() && value.chars().count() <= max && !value.chars().any(char::is_control)
+}
+
+/// 正文校验：允许 `\n` 作为流程标题与流转意见的行分隔（服务端预览格式），
+/// 其余控制字符仍拒绝——换行注入不能进入系统通知。
+pub fn valid_body(value: &str, max: usize) -> bool {
+    !value.trim().is_empty()
+        && value.chars().count() <= max
+        && !value.chars().any(|ch| ch.is_control() && ch != '\n')
 }
 
 pub fn require(valid: bool) -> Result<(), ApiFailure> {

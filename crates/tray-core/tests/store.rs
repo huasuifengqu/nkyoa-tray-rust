@@ -8,7 +8,7 @@ use tokio_util::sync::CancellationToken;
 use tray_core::protocol::Binding;
 use tray_core::protocol::dto::{FeedItem, Seq};
 use tray_core::reception::contracts::{ClientError, ClientStateStore};
-use tray_core::reception::state::{ClientState, PendingPage};
+use tray_core::reception::state::{ClientState, PERSISTED_BODY, PERSISTED_TITLE, PendingPage};
 use tray_core::reception::store::JsonClientStateStore;
 use tray_core::{DeviceToken, ServerOrigin};
 use uuid::Uuid;
@@ -92,8 +92,8 @@ async fn state_is_partitioned_atomic_secret_free_and_restorable() {
                 scenario: "todo".to_owned(),
                 occurred_at: now,
                 expires_at: now + time::Duration::hours(1),
-                title: "OA".to_owned(),
-                body: "请查看 OA".to_owned(),
+                title: "关于开展年度档案整理工作的通知".to_owned(),
+                body: "关于开展年度档案整理工作的通知\n张三：请按制度办理".to_owned(),
                 target: "oa-home".to_owned(),
                 payload_version: 1,
             }],
@@ -111,10 +111,15 @@ async fn state_is_partitioned_atomic_secret_free_and_restorable() {
         .state
         .unwrap();
     assert_eq!(restored.through.0, CURSOR);
-    assert_eq!(
-        restored.pending.as_ref().unwrap().items[0],
-        expected.pending.as_ref().unwrap().items[0]
-    );
+    // 预览文案只允许在内存与系统通知路径出现：落盘条目必须换成通用提示
+    let restored_item = &restored.pending.as_ref().unwrap().items[0];
+    assert_eq!(restored_item.sequence, Seq(CURSOR));
+    assert_eq!(restored_item.title, PERSISTED_TITLE);
+    assert_eq!(restored_item.body, PERSISTED_BODY);
+    let raw = std::fs::read(state_path(directory.path(), &bound)).unwrap();
+    let text = String::from_utf8(raw).unwrap();
+    assert!(!text.contains("年度档案整理"), "落盘文件泄漏了流程标题");
+    assert!(!text.contains("请按制度办理"), "落盘文件泄漏了流转意见");
 
     let other = binding(Uuid::new_v4());
     assert!(store.read(&other, &cancel).await.unwrap().state.is_none());

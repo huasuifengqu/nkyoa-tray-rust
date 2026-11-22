@@ -32,8 +32,9 @@
 ## 契约冻结
 
 - OpenAPI 快照：`contracts/nkyoa-desktop-v1.openapi.json`
-- SHA-256：`5c3e158b79b5dd3e043013b93b5a9f19e2df56fa8e1d22547c024d976a5461af`
+- SHA-256：`07bb73b516d58de24ecb3b6674a41d03e144e1b7878233fb84bbfc9faccaa215`
 - 来源清单：`contracts/source-manifest.json`（协议 v1、5 个路径、导出器 1）
+- 注册能力位：`previewCapable=true`（v1 客户端声明支持流程标题/流转意见预览；服务端只对声明设备下发）
 - 黄金样本：`contracts/golden/*.json`（注册、设备、拉取、确认、历史过期、重同步、撤销）
 - 契约测试：`crates/tray-core/tests/api_contract.rs` 校验哈希、路由、请求头/请求体与字段级拒绝面。
 
