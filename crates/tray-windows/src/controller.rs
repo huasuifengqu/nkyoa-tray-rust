@@ -70,6 +70,9 @@ pub fn run(
         .build()?;
 
     let window = AppWindow::new()?;
+    // 窗口创建后 Slint 上下文已就绪，再选中打包的中文翻译；
+    // 这样随后创建的托盘菜单与内置输入框右键菜单都取中文。
+    let _ = slint::select_bundled_translation("zh_CN");
     let tray = AppTray::new()?;
 
     let platform = Arc::new(WindowsPlatform::new(executable));
